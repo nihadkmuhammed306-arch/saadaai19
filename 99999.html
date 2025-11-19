@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sa'ada AI - Intelligent Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #1a2a6c, #b21f1f);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 28px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .chat-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 18px;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #1a2a6c, #4a5fc1);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message {
+            align-self: flex-start;
+            background-color: #f0f2f5;
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-sender {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-area input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .input-area input:focus {
+            border-color: #1a2a6c;
+            box-shadow: 0 0 0 2px rgba(26, 42, 108, 0.2);
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .send-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background-color: #f0f2f5;
+            padding: 15px;
+            border-radius: 18px;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #999;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 0 20px 20px;
+        }
+        
+        .suggestion {
+            background-color: #f0f2f5;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .suggestion:hover {
+            background-color: #e0e2e5;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 95vh;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🧠</div>
+                <h1>Sa'ada AI</h1>
+            </div>
+            <p class="tagline">Your intelligent assistant for meaningful conversations</p>
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message ai-message">
+                <div class="message-sender">Sa'ada AI</div>
+                <div class="message-text">Hello! I'm Sa'ada AI, your intelligent assistant. How can I help you today?</div>
+            </div>
+        </div>
+        
+        <div class="suggestions">
+            <button class="suggestion" data-prompt="Tell me about artificial intelligence">Tell me about AI</button>
+            <button class="suggestion" data-prompt="How can I improve my productivity?">Productivity tips</button>
+            <button class="suggestion" data-prompt="Explain quantum computing">Quantum computing</button>
+            <button class="suggestion" data-prompt="What are the latest trends in technology?">Tech trends</button>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Ask me anything...">
+            <button class="send-btn" id="sendBtn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const suggestions = document.querySelectorAll('.suggestion');
+        
+        // Sample responses for the AI
+        const aiResponses = {
+            "hello": "Hello! I'm Sa'ada AI. How can I assist you today?",
+            "how are you": "I'm functioning perfectly, thank you for asking! How can I help you?",
+            "what is your name": "I'm Sa'ada AI, your intelligent assistant. The name 'Sa'ada' means happiness in Arabic.",
+            "tell me about artificial intelligence": "Artificial Intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. The core goals of AI include reasoning, knowledge representation, planning, learning, natural language processing, and perception.",
+            "how can i improve my productivity": "Here are some productivity tips:\n1. Prioritize tasks using the Eisenhower Matrix\n2. Use the Pomodoro Technique (25 min work, 5 min break)\n3. Minimize distractions and focus on one task at a time\n4. Set specific, measurable goals\n5. Take regular breaks to maintain mental clarity",
+            "explain quantum computing": "Quantum computing uses quantum-mechanical phenomena like superposition and entanglement to perform computation. Unlike classical computers that use bits (0s and 1s), quantum computers use quantum bits or qubits, which can exist in multiple states simultaneously, allowing them to solve certain problems much faster.",
+            "what are the latest trends in technology": "Current tech trends include:\n- AI and Machine Learning advancements\n- Quantum computing developments\n- Extended Reality (VR/AR/MR)\n- Internet of Things (IoT) expansion\n- 5G and advanced connectivity\n- Blockchain and Web3 technologies\n- Sustainable and green tech solutions",
+            "default": "I'm not sure I understand. Could you please rephrase your question? I'm here to help with information, explanations, and assistance on a wide variety of topics."
+        };
+        
+        // Function to add a message to the chat
+        function addMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+            
+            const senderDiv = document.createElement('div');
+            senderDiv.classList.add('message-sender');
+            senderDiv.textContent = sender === 'user' ? 'You' : 'Sa'ada AI';
+            
+            const textDiv = document.createElement('div');
+            textDiv.classList.add('message-text');
+            textDiv.textContent = text;
+            
+            messageDiv.appendChild(senderDiv);
+            messageDiv.appendChild(textDiv);
+            chatArea.appendChild(messageDiv);
+            
+            // Scroll to the bottom of the chat
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        
+        // Function to simulate AI thinking and response
+        function getAIResponse(userMessage) {
+            // Show typing indicator
+            typingIndicator.style.display = 'block';
+            chatArea.scrollTop = chatArea.scrollHeight;
+            
+            // Simulate AI processing time
+            setTimeout(() => {
+                typingIndicator.style.display = 'none';
+                
+                // Convert user message to lowercase for easier matching
+                const lowerMessage = userMessage.toLowerCase();
+                
+                // Find a matching response or use default
+                let response = aiResponses.default;
+                
+                for (const [key, value] of Object.entries(aiResponses)) {
+                    if (lowerMessage.includes(key) && key !== "default") {
+                        response = value;
+                        break;
+                    }
+                }
+                
+                addMessage('ai', response);
+            }, 1500);
+        }
+        
+        // Function to handle sending a message
+        function sendMessage() {
+            const message = userInput.value.trim();
+            
+            if (message) {
+                // Add user message to chat
+                addMessage('user', message);
+                
+                // Clear input field
+                userInput.value = '';
+                
+                // Get AI response
+                getAIResponse(message);
+            }
+        }
+        
+        // Event listeners
+        sendBtn.addEventListener('click', sendMessage);
+        
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Add event listeners to suggestion buttons
+        suggestions.forEach(button => {
+            button.addEventListener('click', () => {
+                userInput.value = button.getAttribute('data-prompt');
+                sendMessage();
+            });
+        });
+        
+        // Focus on input field when page loads
+        userInput.focus();
+    </script>
+</body>
+</html>
